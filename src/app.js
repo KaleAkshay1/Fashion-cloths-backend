@@ -85,4 +85,8 @@ import product from "./routes/product.js";
 
 app.use("/api/product", product);
 
+import orders from "./routes/orders.js";
+
+app.use("/api/orders", orders);
+
 export default app;

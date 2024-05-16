@@ -6,35 +6,37 @@ import jwt from "jsonwebtoken";
 const verifyUser = asyncHandler(async (req, res, next) => {
   const token = req.cookies?.accessToken;
   if (!token) {
-    // const refreshtoken = req.cookies?.refreshToken;
-    // if (!refreshtoken) {
-    //   req.user = null;
-    //   throw new ApiError(401, "unauthrize");
-    // }
-    // const decodedRefreshToken = jwt.verify(
-    //   refreshtoken,
-    //   process.env.REFRESH_TOKEN_SECRET
-    // );
-    // if (!decodedRefreshToken) {
-    //   req.user = null;
-    //   throw new ApiError(401, "unauthrize Pleze login");
-    // }
-    // const user = await User.findById(decodedRefreshToken.id).select(
-    //   "-password -createdAt -updatedAt"
-    // );
+    const refreshtoken = req.cookies?.refreshToken;
+    if (!refreshtoken) {
+      req.user = null;
+      throw new ApiError(401, "unauthrize");
+    }
+    const decodedRefreshToken = jwt.verify(
+      refreshtoken,
+      process.env.REFRESH_TOKEN_SECRET
+    );
+    if (!decodedRefreshToken) {
+      req.user = null;
+      throw new ApiError(401, "unauthrize Pleze login");
+    }
+    const user = await User.findById(decodedRefreshToken?.id).select(
+      "-password -createdAt -updatedAt "
+    );
 
-    // if (!user) {
-    //   req.user = null;
-    //   throw new ApiError(401, "unauthrize Pleze login");
-    // }
-    // if (user.refreshToken === refreshtoken) {
-    //   const person = await user.genrateAccessToken();
-    //   if (!person) {
-    //     req.user = null;
-    //     throw new ApiError(401, "user not found");
-    //   }
-    //   res.cookie("accessToken",person)
-    // }
+    if (!user) {
+      req.user = null;
+      throw new ApiError(401, "unauthrize Pleze login");
+    }
+    if (user.refreshToken === refreshtoken) {
+      const person = await user.genrateAccessToken();
+      if (!person) {
+        req.user = null;
+        throw new ApiError(401, "user not found");
+      }
+      req.user = user;
+      res.cookie("accessToken", person);
+      next();
+    }
     req.user = null;
     throw new ApiError(401, "unauthorize req  plese login");
   }

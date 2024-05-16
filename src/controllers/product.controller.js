@@ -56,21 +56,67 @@ const addProduct = asyncHandler(async (req, res) => {
 });
 
 const accessCat = asyncHandler(async (req, res, next) => {
+  const minMaxPrice = await Product.aggregate([
+    {
+      $group: {
+        _id: null,
+        minPrice: { $min: "$dPrice" },
+        maxPrice: { $max: "$dPrice" },
+      },
+    },
+  ]);
   res
     .status(200)
     .json(
       new ApiResponce(
         200,
-        { subCategory, category, size, color },
+        { subCategory, category, size, color, minMaxPrice: minMaxPrice[0] },
         "data send succesfully"
       )
     );
 });
 
 const fetchProductData = asyncHandler(async (req, res) => {
-  const data = await Product.find({});
-  data.sort(() => Math.random() - 0.5);
+  const women = await Product.find({ category: "women" })
+    .sort({ price: "desc" })
+    .limit(8);
+  const men = await Product.find({ category: "men" })
+    .sort({ price: "desc" })
+    .limit(6);
+  const kids = await Product.find({ category: "kids" })
+    .sort({ price: "desc" })
+    .limit(4);
+  const data = [...women, ...men, ...kids];
   res.status(200).json(new ApiResponce(200, data, "done"));
 });
 
-export { addProduct, accessCat, fetchProductData };
+const fetchProductCategoryData = asyncHandler(async (req, res) => {
+  const { cat } = req.params;
+  const count = await Product.countDocuments({ category: cat });
+  const data = await Product.find({
+    category: cat,
+  }).limit(8);
+  res.status(200).json(new ApiResponce(200, { data, count }, "product found"));
+});
+
+const fetchMoreProductData = asyncHandler(async (req, res) => {
+  const { cat, startVal } = req.params;
+  let data;
+  if (Number(startVal)) {
+    data = await Product.find({ category: cat })
+      .skip(Number(startVal))
+      .limit(8);
+  } else {
+    data = await Product.find({ category: cat }).limit(8);
+  }
+
+  res.status(200).json(new ApiResponce(200, data, "data fetchd"));
+});
+
+export {
+  addProduct,
+  accessCat,
+  fetchProductData,
+  fetchProductCategoryData,
+  fetchMoreProductData,
+};

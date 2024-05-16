@@ -135,6 +135,7 @@ const googleLogout = asyncHandler(async (req, res, next) => {
 });
 
 const getUserDetail = asyncHandler((req, res) => {
+  console.log("function", req.user);
   if (req.user) {
     return res
       .status(200)
@@ -154,6 +155,7 @@ const prac = (req, res) => {
 };
 
 const checkUser = asyncHandler(async (req, res) => {
+  console.log(req.user);
   res.status(200).json(new ApiResponce(200, req.user, "login successfull"));
 });
 
