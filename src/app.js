@@ -89,4 +89,16 @@ import orders from "./routes/orders.js";
 
 app.use("/api/orders", orders);
 
+import items from "./routes/items.route.js";
+
+app.use("/api/items", items);
+
+import whishlist from "./routes/whishlist.route.js";
+
+app.use("/api/whishlist", whishlist);
+
+import cart from "./routes/cart.route.js";
+
+app.use("/api/cart", cart);
+
 export default app;

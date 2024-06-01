@@ -141,7 +141,7 @@ const getUserDetail = asyncHandler((req, res) => {
       .status(200)
       .json(new ApiResponce(200, req.user, "user is loged in"));
   }
-  res.status(401).json(new ApiResponce(401, "", "unaithoroze user"));
+  res.status(401).json(new ApiResponce(401, {}, "unaithoroze user"));
 });
 
 const sendData = (req, res) => {

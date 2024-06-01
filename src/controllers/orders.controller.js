@@ -5,7 +5,7 @@ import { UserOrders } from "../models/userOrders.model.js";
 import ApiResponce from "../utils/ApiResponce.js";
 
 const addProductInWhishlist = asyncHandler(async (req, res) => {
-  const { id, color } = req.params;
+  const { id } = req.params;
   const user = req.user;
   const data = await User.findById(user._id);
   if (!data) {
@@ -20,7 +20,6 @@ const addProductInWhishlist = asyncHandler(async (req, res) => {
         $addToSet: {
           whishlist: {
             productId: id,
-            color,
           },
         },
       },
@@ -32,7 +31,6 @@ const addProductInWhishlist = asyncHandler(async (req, res) => {
       whishlist: [
         {
           productId: id,
-          color,
         },
       ],
     });

@@ -16,7 +16,7 @@ const route = express.Router();
 route.post("/register", userRegister);
 route.post("/check-otp", checkOtp);
 route.post("/login", userLogin);
-route.get("/check-owner", verifyUser, getUserDetail);
+route.get("/check-user", verifyUser, getUserDetail);
 route.get("/prac", prac);
 route.get("/logout", verifyUser, logoutUser);
 route.get("/logout-with-google", verifyUser, googleLogout);

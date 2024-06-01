@@ -60,18 +60,6 @@ const ordersScema = new Schema(
   { timestamps: true }
 );
 
-const whishlistSchema = new Schema({
-  productId: {
-    type: Schema.Types.ObjectId,
-    ref: "Product",
-    required: true,
-  },
-  color: {
-    type: String,
-    required: true,
-  },
-});
-
 const userOrderSchema = new Schema(
   {
     user: {
@@ -80,7 +68,15 @@ const userOrderSchema = new Schema(
       required: true,
       unique: true,
     },
-    whishlist: [whishlistSchema],
+    whishlist: [
+      {
+        productId: {
+          type: Schema.Types.ObjectId,
+          ref: "Product",
+          required: true,
+        },
+      },
+    ],
     bag: [bagSchema],
     orders: [ordersScema],
   },
