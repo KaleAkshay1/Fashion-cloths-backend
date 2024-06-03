@@ -4,6 +4,24 @@ import ApiError from "../utils/ApiError.js";
 import ApiResponce from "../utils/ApiResponce.js";
 import asyncHandler from "../utils/asyncHandler.js";
 
+const accesData = async (user) => {
+  try {
+    const item = await Cart.findOne({
+      user: user._id,
+    }).populate("items.itemId");
+    let items;
+    if (!item) {
+      items = [];
+    } else {
+      const itemsId = item.items.map((ele) => ele.itemId);
+      items = item.items;
+    }
+    return items;
+  } catch (error) {
+    return [];
+  }
+};
+
 const acessCartData = asyncHandler(async (req, res) => {
   const user = req.user;
   if (!user) {
@@ -100,17 +118,70 @@ const removeCartData = asyncHandler(async (req, res) => {
 
 const acessDataFromCart = asyncHandler(async (req, res) => {
   const user = req.user;
-  const item = await Cart.findOne({
-    user: user._id,
-  }).populate("items.itemId");
-  let items;
-  if (!item) {
-    items = [];
-  } else {
-    const itemsId = item.items.map((ele) => ele.itemId);
-    items = item.items;
-  }
+  const items = await accesData(user);
   res.status(200).json(new ApiResponce(200, items, "done"));
 });
 
-export { acessCartData, addCartData, removeCartData, acessDataFromCart };
+const incressQuentitiy = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const user = req.user;
+
+  const userExist = await Cart.findOne({ user: user._id });
+  if (!userExist) {
+    throw new ApiError(400, "user doesnt have any items in bag");
+  }
+  const data = userExist.items.filter((ele) => ele.itemId == id);
+  if (data.length !== 1) {
+    throw new ApiError(400, "item not exist in cart");
+  }
+  const item = await Item.findById(id);
+  if (!item) {
+    throw new ApiError(400, "invalid item id");
+  }
+  const size = data[0].size;
+
+  if (data[0].quantity < item.sizes.get(size)) {
+    data[0].quantity = data[0].quantity + 1;
+    data[0].price = Number(data[0].price) + Number(item.priceInfo.finalPrice);
+    await userExist.save();
+  } else {
+    throw new ApiError(400, "Item is out of Stock");
+  }
+  const val = await accesData(user);
+  res.status(200).json(new ApiResponce(200, val, "done"));
+});
+
+const decressQuentity = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const user = req.user;
+  const userExist = await Cart.findOne({ user: user._id });
+  if (!userExist) {
+    throw new ApiError(400, "user doesnt have any items in bag");
+  }
+  const data = userExist.items.filter((ele) => ele.itemId == id);
+  if (data.length !== 1) {
+    throw new ApiError(400, "item not exist in cart");
+  }
+  const item = await Item.findById(id);
+  if (!item) {
+    throw new ApiError(400, "invalid item id");
+  }
+  if (data[0].quantity > 1) {
+    data[0].price = data[0].price - item.priceInfo.initialPrice;
+    data[0].quantity = data[0].quantity - 1;
+    await userExist.save();
+  } else {
+    throw new ApiError(400, "Quantity cannot be less than 1.");
+  }
+  const val = await accesData(user);
+  res.status(200).json(new ApiResponce(200, val, "done"));
+});
+
+export {
+  acessCartData,
+  addCartData,
+  removeCartData,
+  acessDataFromCart,
+  incressQuentitiy,
+  decressQuentity,
+};

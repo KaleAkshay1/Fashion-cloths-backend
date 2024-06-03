@@ -15,7 +15,7 @@ const itemsSchema = new Schema(
       default: 1,
     },
     price: {
-      type: String,
+      type: Number,
     },
   },
   { timestamps: true, _id: false }

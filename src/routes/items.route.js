@@ -4,6 +4,7 @@ import {
   fetchFilterData,
   fetchItemsData,
   filteredItems,
+  practise,
   reletedItemsOfSelectedProduct,
   seeDetailOfProduct,
 } from "../controllers/items.controller.js";
@@ -16,5 +17,6 @@ route.get("/fetch-items-data", fetchItemsData);
 route.get("/fetch-related-items/:id", reletedItemsOfSelectedProduct);
 route.get("/see-detail-of-product/:id", seeDetailOfProduct);
 route.get("/fetch-items-data/:start", accessMoreItems);
+route.get("/practise", practise);
 
 export default route;

@@ -1,4 +1,5 @@
 import { Item } from "../models/Items.model.js";
+import User from "../models/user.model.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponce from "../utils/ApiResponce.js";
 import asyncHandler from "../utils/asyncHandler.js";
@@ -280,6 +281,19 @@ const seeDetailOfProduct = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponce(200, data, "done"));
 });
 
+const practise = asyncHandler(async (req, res) => {
+  const user = await User.aggregate([
+    {
+      $group: {
+        _id: "$_id",
+      },
+    },
+  ]);
+  const userIds = await user.map((entry) => entry._id);
+  console.log(userIds);
+  res.send("done");
+});
+
 export {
   fetchItemsData,
   accessMoreItems,
@@ -287,4 +301,5 @@ export {
   filteredItems,
   reletedItemsOfSelectedProduct,
   seeDetailOfProduct,
+  practise,
 };
