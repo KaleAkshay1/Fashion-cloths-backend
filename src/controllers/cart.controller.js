@@ -3,6 +3,8 @@ import { Item } from "../models/Items.model.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponce from "../utils/ApiResponce.js";
 import asyncHandler from "../utils/asyncHandler.js";
+import razorpay from "razorpay";
+import axios from "axios";
 
 const accesData = async (user) => {
   try {
@@ -84,14 +86,12 @@ const addCartData = asyncHandler(async (req, res) => {
 const removeCartData = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const user = req.user;
-  console.log("run");
   if (!id) {
     throw new ApiError(400, "Id is necessary");
   }
   if (!user) {
     throw new ApiError(401, "Unauthorize persone");
   }
-  console.log("run1");
   const item = await Cart.findOne({
     user: user._id,
     items: { $in: { itemId: id } },
@@ -99,7 +99,6 @@ const removeCartData = asyncHandler(async (req, res) => {
   if (!item) {
     new ApiError(400, "Product is not availbel in cart");
   }
-  console.log("run2");
   const data = await Cart.findOneAndUpdate(
     { user: user._id },
     {
@@ -109,10 +108,7 @@ const removeCartData = asyncHandler(async (req, res) => {
     },
     { new: true }
   );
-  console.log("run3");
   const items = data.items.map((ele) => ele.itemId);
-  console.log(items);
-  console.log(items.length);
   res.status(200).json(new ApiResponce(200, items, "done"));
 });
 

@@ -12,7 +12,7 @@ const itemsSchema = new Schema({
     trim: true,
   },
   gender: {
-    enum: ["men", "women", "kids"],
+    enum: ["men", "women", "kids", "unisex"],
     type: String,
     trim: true,
     required: true,

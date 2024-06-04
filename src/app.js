@@ -78,27 +78,24 @@ app.get("/api/user/google/login", (req, res, next) => {
 });
 //
 import user from "./routes/user.js";
-
 app.use("/api/user", user);
 
 import product from "./routes/product.js";
-
 app.use("/api/product", product);
 
 import orders from "./routes/orders.js";
-
 app.use("/api/orders", orders);
 
 import items from "./routes/items.route.js";
-
 app.use("/api/items", items);
 
 import whishlist from "./routes/whishlist.route.js";
-
 app.use("/api/whishlist", whishlist);
 
 import cart from "./routes/cart.route.js";
-
 app.use("/api/cart", cart);
+
+import order from "./routes/PaymentAndOrder.route.js";
+app.use("/api/order", order);
 
 export default app;

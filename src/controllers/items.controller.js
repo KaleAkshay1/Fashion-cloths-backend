@@ -281,16 +281,11 @@ const seeDetailOfProduct = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponce(200, data, "done"));
 });
 
+function roundDownToNearestTen(number) {
+  return Math.floor(number / 10) * 10;
+}
+
 const practise = asyncHandler(async (req, res) => {
-  const user = await User.aggregate([
-    {
-      $group: {
-        _id: "$_id",
-      },
-    },
-  ]);
-  const userIds = await user.map((entry) => entry._id);
-  console.log(userIds);
   res.send("done");
 });
 
