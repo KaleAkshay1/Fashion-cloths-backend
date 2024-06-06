@@ -44,9 +44,6 @@ const addCartData = asyncHandler(async (req, res) => {
   if (!id || !size) {
     throw new ApiError(400, "Id and Size is necessary");
   }
-  if (!user) {
-    throw new ApiError(401, "Unauthorize persone");
-  }
   const product = await Item.findById(id);
   if (!product) {
     throw new ApiError(400, "Invalide product id");
@@ -66,7 +63,8 @@ const addCartData = asyncHandler(async (req, res) => {
             items: {
               itemId: id,
               size,
-              price: product.priceInfo.finalPrice,
+              price: product.priceInfo.initialPrice,
+              dPrice: product.priceInfo.finalPrice,
             },
           },
         },
@@ -76,7 +74,14 @@ const addCartData = asyncHandler(async (req, res) => {
   } else {
     data = await Cart.create({
       user: user._id,
-      items: [{ itemId: id, size, price: product.priceInfo.finalPrice }],
+      items: [
+        {
+          itemId: id,
+          size,
+          price: product.priceInfo.initialPrice,
+          dPrice: product.priceInfo.finalPrice,
+        },
+      ],
     });
   }
   const items = data.items.map((ele) => ele.itemId);
@@ -138,7 +143,8 @@ const incressQuentitiy = asyncHandler(async (req, res) => {
 
   if (data[0].quantity < item.sizes.get(size)) {
     data[0].quantity = data[0].quantity + 1;
-    data[0].price = Number(data[0].price) + Number(item.priceInfo.finalPrice);
+    data[0].price = Number(data[0].price) + Number(item.priceInfo.initialPrice);
+    data[0].dPrice = Number(data[0].dPrice) + Number(item.priceInfo.finalPrice);
     await userExist.save();
   } else {
     throw new ApiError(400, "Item is out of Stock");
@@ -164,6 +170,7 @@ const decressQuentity = asyncHandler(async (req, res) => {
   }
   if (data[0].quantity > 1) {
     data[0].price = data[0].price - item.priceInfo.initialPrice;
+    data[0].dPrice = data[0].dPrice - item.priceInfo.finalPrice;
     data[0].quantity = data[0].quantity - 1;
     await userExist.save();
   } else {

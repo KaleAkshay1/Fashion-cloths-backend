@@ -83,9 +83,6 @@ app.use("/api/user", user);
 import product from "./routes/product.js";
 app.use("/api/product", product);
 
-import orders from "./routes/orders.js";
-app.use("/api/orders", orders);
-
 import items from "./routes/items.route.js";
 app.use("/api/items", items);
 

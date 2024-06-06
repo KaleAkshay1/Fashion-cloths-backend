@@ -67,6 +67,10 @@ const itemsSchema = new Schema({
     type: Map,
     of: Number,
   },
+  seledItem: {
+    type: Map,
+    of: Number,
+  },
   details: {
     type: Map,
     of: String,

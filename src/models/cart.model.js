@@ -14,6 +14,9 @@ const itemsSchema = new Schema(
       type: Number,
       default: 1,
     },
+    dPrice: {
+      type: Number,
+    },
     price: {
       type: Number,
     },
