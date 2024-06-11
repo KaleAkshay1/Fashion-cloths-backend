@@ -40,10 +40,18 @@ const decressOrderdQuentity = async (items) => {
   await Promise.all(
     items.items.map(async (ele, ind) => {
       const size = `sizes.${ele.size}`;
-      let item = await Item.findByIdAndUpdate(ele.itemId, {
-        $inc: { [size]: -ele.quantity },
-        $set: { seledItem: { S: ele.quantity } },
-      });
+      let item = await Item.findById(ele.itemId);
+      if (item) {
+        let currentSizeValue = item.sizes.get(ele.size) || 0;
+        item.sizes.set(ele.size, currentSizeValue - ele.quantity);
+        if (!item.seledItem) {
+          item.seledItem = new Map();
+        }
+        let currentSeledItemValue = item.seledItem.get(ele.size) || 0;
+        item.seledItem.set(ele.size, currentSeledItemValue + ele.quantity);
+        await item.save();
+        let updatedItem = await Item.findById(ele.itemId);
+      }
     })
   );
 };

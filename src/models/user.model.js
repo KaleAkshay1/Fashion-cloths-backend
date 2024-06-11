@@ -4,13 +4,23 @@ import bcrypt from "bcrypt";
 
 const userSchema = new Schema(
   {
-    username: {
+    firstName: {
       type: String,
-      unique: true,
-      lowercase: true,
-      index: true,
-      require: true,
       trim: true,
+      lowercase: true,
+    },
+    lastName: {
+      type: String,
+      trim: true,
+      lowercase: true,
+    },
+    phone: {
+      type: Number,
+    },
+    gender: {
+      type: String,
+      trim: true,
+      lowercase: true,
     },
     email: {
       type: String,
@@ -50,7 +60,9 @@ userSchema.methods.genrateAccessToken = function () {
   return jwt.sign(
     {
       id: this._id,
-      username: this.username,
+      firstName: this.firstName,
+      lastName: this.lastName,
+      phone: this?.phone,
       email: this.password,
       googleId: this?.googleId,
       refreshToken: this.refreshToken,

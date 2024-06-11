@@ -31,7 +31,7 @@ const addProduct = asyncHandler(async (req, res) => {
       for (let i in element.sizes) {
         data[index].sizes[i] = Number(element.sizes[i]);
       }
-      for (let i in req.files) {
+      for (let i in req.file) {
         if (i.startsWith(index)) {
           let path = req.files[i][0].path;
           const result = await uplodeOnCloudinary(path, "Product");

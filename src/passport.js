@@ -19,16 +19,18 @@ const passportConfiguratuion = async function (
     }
     if (!user && !data) {
       const data = await User.create({
-        username: profile.email.split("@gmail.com")[0],
+        firstName: profile.name.givenName,
+        lastName: profile.name.familyName,
         email: profile.email,
         profile_image: profile.picture,
         googleId: profile.id,
       });
       return done(null, data);
     }
+    console.log("run3");
     done(null, user);
   } catch (error) {
-    done(error);
+    console.log(error.message);
   }
 };
 

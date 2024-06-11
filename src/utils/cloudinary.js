@@ -23,15 +23,29 @@ const uplodeOnCloudinary = async (path, fold) => {
   }
 };
 
-const deleteFromCloudinary = async (path) => {
+const deleteFromCloudinary = async (path, fold) => {
   try {
-    if (!path) return null;
-    const a = path.split("Myntra/");
-    const b = a[1].split(".");
-    const responce = await cloudinary.uploader.destroy(b[0]);
-    return responce;
+    if (!path || !fold) {
+      console.log("Invalid path or folder provided");
+      return null;
+    }
+    const pathParts = path.split("Myntra/");
+    if (pathParts.length < 2) {
+      console.log("Invalid path format");
+      return null;
+    }
+
+    const filePart = pathParts[1].split(".")[0];
+    const publicId = `Myntra/${filePart}`;
+
+    const response = await cloudinary.uploader.destroy(publicId);
+
+    if (response.result === "not found") {
+      console.log(`Resource not found on Cloudinary: ${publicId}`);
+    }
+    return response;
   } catch (error) {
-    console.log("this error ocure when deleted file on cloudinatry", error);
+    console.error("Error occurred while deleting file on Cloudinary", error);
     return null;
   }
 };

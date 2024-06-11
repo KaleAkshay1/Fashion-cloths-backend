@@ -95,4 +95,7 @@ app.use("/api/cart", cart);
 import order from "./routes/PaymentAndOrder.route.js";
 app.use("/api/order", order);
 
+import admin from "./routes/admin.route.js";
+app.use("/api/admin", admin);
+
 export default app;

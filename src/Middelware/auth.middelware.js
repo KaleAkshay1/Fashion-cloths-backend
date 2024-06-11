@@ -34,6 +34,7 @@ const verifyUser = asyncHandler(async (req, res, next) => {
         throw new ApiError(401, "user not found");
       }
       req.user = user;
+      console.log(user);
       res.cookie("accessToken", person);
       next();
     }

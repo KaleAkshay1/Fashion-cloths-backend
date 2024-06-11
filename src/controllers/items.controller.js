@@ -1,4 +1,5 @@
 import { Item } from "../models/Items.model.js";
+import { History } from "../models/history.model.js";
 import User from "../models/user.model.js";
 import ApiError from "../utils/ApiError.js";
 import ApiResponce from "../utils/ApiResponce.js";
@@ -273,7 +274,6 @@ const reletedItemsOfSelectedProduct = asyncHandler(async (req, res) => {
 
 const seeDetailOfProduct = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  console.log(id);
   const data = await Item.findById(id);
   if (!data) {
     throw ApiError(400, "Invalid Product");
@@ -281,12 +281,70 @@ const seeDetailOfProduct = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponce(200, data, "done"));
 });
 
-function roundDownToNearestTen(number) {
-  return Math.floor(number / 10) * 10;
-}
+const similarItems = asyncHandler(async (req, res) => {
+  const { gender, category, brand } = req.query;
+  if (!gender || !category || !brand) {
+    throw new ApiError(400, "Gender and Category required");
+  }
+  let data = await Item.find({ gender, category, brand });
+  if (data.length < 15) {
+    data = await Item.find({ gender, category });
+  }
+  if (data.length < 15) {
+    data = await Item.find({ category });
+  }
+  const shuffelData = data.sort(() => Math.random() - 0.5);
+  res.status(200).json(new ApiResponce(200, shuffelData.slice(0, 15), "done"));
+});
 
-const practise = asyncHandler(async (req, res) => {
-  res.send("done");
+const accessRecentlyViewed = asyncHandler(async (req, res) => {
+  const user = req.user;
+  const data = await History.findOne({
+    user: user._id,
+  }).populate("items");
+  res.status(200).json(new ApiResponce(200, data?.items, "done"));
+});
+
+const addItemsInHistory = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const user = req.user;
+  const itemExist = await History.findOne({
+    user: user._id,
+    items: { $in: [id] },
+  });
+
+  if (itemExist) {
+    console.log("Item already exists in history");
+    return res
+      .status(200)
+      .json(new ApiResponce(200, itemExist, "Item already exists in history"));
+  } else {
+    const response = await History.findOneAndUpdate(
+      { user: user._id },
+      {
+        $push: {
+          items: {
+            $each: [id],
+            $position: 0,
+          },
+        },
+      },
+      { new: true, upsert: true }
+    );
+
+    if (response.items.length > 14) {
+      console.log("History exceeds 14 items, removing the last item");
+      await History.findOneAndUpdate(
+        { user: user._id },
+        { $pop: { items: 1 } },
+        { new: true }
+      );
+    }
+
+    res
+      .status(200)
+      .json(new ApiResponce(200, response.items, "Item added to history"));
+  }
 });
 
 export {
@@ -296,5 +354,7 @@ export {
   filteredItems,
   reletedItemsOfSelectedProduct,
   seeDetailOfProduct,
-  practise,
+  similarItems,
+  accessRecentlyViewed,
+  addItemsInHistory,
 };
